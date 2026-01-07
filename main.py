@@ -1,28 +1,20 @@
+import matplotlib.pyplot as plt
 import numpy as np
+from skimage.filters import median
+from skimage.morphology import ball
 from PIL import Image
-from image_utils import load_image, edge_detection
 
-def main():
-    input_path = 'lena.jpg'
-    output_path = 'lena_edges.jpg'
-    
-    try:
-        print(f"Loading image: {input_path}...")
-        original_image_array = load_image(input_path)
-        
-        print("Performing edge detection...")
-        edges_array = edge_detection(original_image_array)
-        
-        edges_image = Image.fromarray(edges_array)
-        
-        edges_image.save(output_path)
-        print(f"Success! Edge-detected image saved as: {output_path}")
-        
+test = load_image("swimmer.jpg")
+clean_image = median(test, ball(3))
+edge_test = edge_detection(clean_image)
+threshold_value = 50
+edge_binary = edge_test > threshold_value
 
-    except FileNotFoundError:
-        print(f"Error: The file '{input_path}' was not found. Please make sure it's in the project folder.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+plt.figure(figsize=(10, 5))
+plt.imshow(edge_binary, cmap='gray')
+plt.axis('off')
+plt.show()
 
-if __name__ == "__main__":
-    main()
+
+edge_image = Image.fromarray((edge_binary * 255).astype(np.uint8)) 
+edge_image.save("my_edges.png")
